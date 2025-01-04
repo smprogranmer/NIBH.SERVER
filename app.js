@@ -7,7 +7,7 @@ import cors from "cors";
 // import coursesRouter from "./routes/Courses.route.js";
 
 config({
-  path: "./config/.env",
+  path: "./.env",
 });
 // const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
 
