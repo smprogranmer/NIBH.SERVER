@@ -28,9 +28,9 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 
 export const getSingleProduct = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const Product = await Product.findById(id);
+    const overviewProduct = await Product.findById(id);
     res.status(200).json({
       success: true,
-      Product,
+      overviewProduct,
     });
 })
