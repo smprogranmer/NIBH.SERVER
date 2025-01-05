@@ -25,3 +25,12 @@ export const getAllProducts = asyncHandler(async (req, res) => {
       Products,
     });
 });
+
+export const getSingleProduct = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const Product = await Product.findById(id);
+    res.status(200).json({
+      success: true,
+      Product,
+    });
+})
