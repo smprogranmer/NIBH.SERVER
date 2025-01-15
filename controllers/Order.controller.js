@@ -161,7 +161,6 @@ export const getOrdersByUserRefId = asyncHandler(async (req, res) => {
     order_newiraniborkahosue,
     process.env.JWT_SECRET_KEY
   );
-  const decodedUser = JWT.verify();
   console.log("🚀 ~ getOrdersByUserRefId ~ decodeRefId:", decodeRefId);
   // find order by refId in database
   const order = await Order.find(
