@@ -1,10 +1,10 @@
-// import { Order } from "../models/Order.model.js";
-// import { User } from "../models/User.model.js";
-// import { ApiError } from "../utils/ApiError.js";
-// import { ApiResponse } from "../utils/ApiResponse.js";
-// import { asyncHandler } from "../utils/asyncHandler.js";
-// import JWT from "jsonwebtoken";
-// import { v4 as uuidv4 } from "uuid";
+import { Order } from "../models/Order.model.js";
+import { User } from "../models/User.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import JWT from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 // function generateSecureOrderId(length = 15) {
 //   const uuid = uuidv4(); // Generate UUID
@@ -152,32 +152,32 @@
 //     .json(new ApiResponse(200, "Orders fetched successfully for user"));
 // });
 
-// export const getOrdersByUserRefId = asyncHandler(async (req, res) => {
-//   // get user email from cookie then find order by user email
-//   const { order_newiraniborkahosue } = req.cookies;
-//   console.log("🚀 ~ getOrdersByUserRefId ~ refId:", order_newiraniborkahosue);
-//   // decoded the refId to find order by refId
-//   const decodeRefId = JWT.verify(
-//     order_newiraniborkahosue,
-//     process.env.JWT_SECRET_KEY
-//   );
-//   console.log("🚀 ~ getOrdersByUserRefId ~ decodeRefId:", decodeRefId);
-//   // find order by refId in database
-//   const order = await Order.find(
-//     {
-//       refId: decodeRefId.refId,
-//     },
-//     {
-//       orderProducts: 1,
-//       totalPrice: 1,
-//       orderId: 1,
-//       _id: 0, // Exclude _id from the output
-//     }
-//   );
-//   console.log("🚀 ~ getOrdersByUserRefId ~ order:", order);
-//   if (!order) return ApiError(404, "Order not found");
+export const getOrdersByUserRefId = asyncHandler(async (req, res) => {
+  // get user email from cookie then find order by user email
+  const { order_newiraniborkahosue } = req.cookies;
+  console.log("🚀 ~ getOrdersByUserRefId ~ refId:", order_newiraniborkahosue);
+  // decoded the refId to find order by refId
+  const decodeRefId = JWT.verify(
+    order_newiraniborkahosue,
+    process.env.JWT_SECRET_KEY
+  );
+  console.log("🚀 ~ getOrdersByUserRefId ~ decodeRefId:", decodeRefId);
+  // find order by refId in database
+  const order = await Order.find(
+    {
+      refId: decodeRefId.refId,
+    },
+    {
+      orderProducts: 1,
+      totalPrice: 1,
+      orderId: 1,
+      _id: 0, // Exclude _id from the output
+    }
+  );
+  console.log("🚀 ~ getOrdersByUserRefId ~ order:", order);
+  if (!order) return ApiError(404, "Order not found");
 
-//   return res
-//     .status(200)
-//     .json(new ApiResponse(200, order, "Orders fetched successfully for user"));
-// });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, order, "Orders fetched successfully for user"));
+});
