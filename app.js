@@ -33,11 +33,11 @@ app.get("/", (req, res) => {
 
 // routes import
 import productRouter from "./routes/Product.routes.js";
-import orderRouter from "./routes/Order.routes.js";
+// import orderRouter from "./routes/Order.routes.js";
 
 // routes declaration
 app.use("/api/v1/products",productRouter);
-app.use("/api/v1/orders",orderRouter);
+// app.use("/api/v1/orders",orderRouter);
 
 app.get("/", (req, res) => {
   res.send("hello");
