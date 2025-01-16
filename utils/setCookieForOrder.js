@@ -8,7 +8,7 @@ export const setCookieForOrders = (userRefId,status,res) =>{
       const cookieOptions = {
         httpOnly: true,
         secure: true,
-        "domain": "https://newiraniborkahouse.vercel.app"
+        domain: "newiraniborkahouse.vercel.app"
       };
     
       return res
