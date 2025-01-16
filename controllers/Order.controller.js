@@ -156,12 +156,19 @@ export const getOrdersByUserRefId = asyncHandler(async (req, res) => {
   // get user email from cookie then find order by user email
   const { order_newiraniborkahosue } = req.cookies;
   console.log("🚀 ~ getOrdersByUserRefId ~ refId:", order_newiraniborkahosue);
+  if (!order_newiraniborkahosue) {
+    throw new ApiError(401,"Unauthorized request");
+  }
+
   // decoded the refId to find order by refId
   const decodeRefId = JWT.verify(
     order_newiraniborkahosue,
     process.env.JWT_SECRET_KEY
   );
-  console.log("🚀 ~ getOrdersByUserRefId ~ decodeRefId:", decodeRefId);
+
+  if(!decodeRefId) {
+    throw new ApiResponse(404,"Order not found")
+  }
   // find order by refId in database
   const order = await Order.find(
     {
