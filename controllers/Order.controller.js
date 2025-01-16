@@ -4,16 +4,19 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import JWT from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
+import { checkAndSetCookies } from "../utils/CheckCookieAndCreate.js";
+import { setCookieForOrders } from "../utils/setCookieForOrder.js";
 
-function generateSecureOrderId(length = 15) {
-  const uuid = uuidv4(); // Generate UUID
-  const numericId = uuid.replace(/\D/g, ""); // Remove non-numeric characters
-  return numericId.substring(0, length); // Truncate to desired length
-}
 export const createOrder = asyncHandler(async (req, res) => {
   // // logic for creating order goes here
   const { totalPrice, orderProducts, shippingDetails } = req.body;
+
+  const { order_newiraniborkahosue } = req.cookies;
+
+  const { refId, orderId } = checkAndSetCookies(order_newiraniborkahosue);
+
+  let user;
+  let userRefId = refId;
 
   if (
     !totalPrice ||
@@ -30,10 +33,6 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
   // check user exit
-
-  let user;
-  let userRefId;
-
   if (shippingDetails.user) {
     user = await User.findOne({ email: shippingDetails.email });
 
@@ -64,16 +63,6 @@ export const createOrder = asyncHandler(async (req, res) => {
     }
   }
 
-  const oldToken = req.cookies;
-  const decodedToken = JWT.verify(oldToken.order, process.env.JWT_SECRET_KEY);
-  userRefId = decodedToken.refId;
-  if (!decodedToken) return (userRefId = generateSecureOrderId());
-
-  // Generate and validate unique orderId
-  let orderId = generateSecureOrderId();
-
-  console.log("🚀 ~ createOrder ~ refId:", userRefId);
-  // Create the order
   const order = await Order.create({
     orderId,
     orderProducts,
@@ -82,46 +71,21 @@ export const createOrder = asyncHandler(async (req, res) => {
     userId: user ? user._id : null, // Attach user ID if available
     refId: user ? "" : userRefId,
   });
-  // console.log("🚀 ~ createOrder ~ order:", order)
-  console.log("🚀 ~ createOrder ~ order:", order);
 
   if (user) {
     // Update user's order history if the user exists
     user.orders.push(order._id);
     await user.save();
-
-    return res
-      .status(200)
-      .json({ message: "Order created successfully", order });
   }
 
-  // console.log("🚀 ~ createOrder ~ oldToken:", oldToken)
-  console.log("🚀 ~ createOrder ~ token:", oldToken);
-  if (oldToken.order) {
-    res
-      .status(200)
-      .json({
-        message: "Order created successfully without set cookie",
-        order,
-      });
+  if (order_newiraniborkahosue) {
+    return res.status(200).json({
+      message: "Order created successfully without set cookie",
+      order,
+    });
   }
-  // Generate JWT token and set cookie for the user
-  const token = JWT.sign({ refId: userRefId }, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRE_SECRET_KEY || "30d",
-  });
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-  };
-
-  return res
-    .cookie("order", token, cookieOptions) // Set cookie only if the user exists
-    .status(200)
-    .json({ message: "Order created successfully", order });
-  // If no user is associated with the order, return without setting a cookie
+  setCookieForOrders(userRefId, 200, res);
 });
 
 export const getAllOrder = asyncHandler(async (req, res) => {
@@ -157,7 +121,7 @@ export const getOrdersByUserRefId = asyncHandler(async (req, res) => {
   const { order_newiraniborkahosue } = req.cookies;
   console.log("🚀 ~ getOrdersByUserRefId ~ refId:", order_newiraniborkahosue);
   if (!order_newiraniborkahosue) {
-    throw new ApiError(401,"Unauthorized request");
+    throw new ApiError(401, "Unauthorized request");
   }
 
   // decoded the refId to find order by refId
@@ -166,8 +130,8 @@ export const getOrdersByUserRefId = asyncHandler(async (req, res) => {
     process.env.JWT_SECRET_KEY
   );
 
-  if(!decodeRefId) {
-    throw new ApiResponse(404,"Order not found")
+  if (!decodeRefId) {
+    throw new ApiResponse(404, "Order not found");
   }
   // find order by refId in database
   const order = await Order.find(
