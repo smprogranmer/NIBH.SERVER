@@ -4,7 +4,7 @@ import { getAllProducts, getSingleProduct } from '../controllers/Products.contro
 const router = Router();
 
 router.get('/',getAllProducts)
-router.get('/:id',getSingleProduct)
+router.get('/:slug',getSingleProduct)
 
 
 export default router

@@ -27,8 +27,10 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 });
 
 export const getSingleProduct = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const product = await Product.findById(id);
+    const { slug } = req.params;
+    console.log("🚀 ~ getSingleProduct ~ slug:", slug)
+    console.log(req.params)
+    const product = await Product.findOne({slug});
     res.status(200).json({
       success: true,
       product,

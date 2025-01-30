@@ -34,15 +34,33 @@ app.get("/", (req, res) => {
 // routes import
 import productRouter from "./routes/Product.routes.js";
 import orderRouter from "./routes/Order.routes.js";
+import userRouter from "./routes/User.routes.js";
+import { ApiError } from "./utils/ApiError.js";
 
 // routes declaration
 app.use("/api/v1/products",productRouter);
 app.use("/api/v1/orders",orderRouter);
+app.use("/api/v1/user",userRouter);
 
 app.get("/", (req, res) => {
   res.send("hello");
 });
 
+// error middleware 
+app.use((err, req, res, next) => {
+  if (err instanceof ApiError) {
+      res.status(err.statusCode).json({
+          success: err.success,
+          message: err.message,
+          errors: err.errors,
+      });
+  } else {
+      res.status(500).json({
+          success: false,
+          message: "Internal Server Error",
+      });
+  }
+});
 
 // app.use("/api/v1/", coursesRouter);
 
